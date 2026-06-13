@@ -13,14 +13,58 @@ datasource db {
 }
 
 model User{
+ id  Int @id @default(autoincrement())
+ username String @unique
+ password String
+ orders Order[]
+}
+enum OrderSide {
+  BUY
+  SELL
+}
+enum OrderType {
+  MARKET
+  LIMIT
+}
 
+enum OrderStatus {
+  PENDING
+  PARTIALLY_FILLED
+  FILLED
+  CANCELLED
 }
 model Order{
-
+  id Int @id @default(autoincrement())
+  userId Int
+  user User @relation(fields: [userId],references: [id])
+  side OrderSide
+  type OrderType
+  stockId Int
+  stock Stock @relation(fields: [stockId],references: [id])
+  price Float?
+  qty Float
+  Filledqty Float @default(0)
+  status OrderStatus @default(PENDING)
+  buyFills   Fill[]      @relation("BuyOrderFills")
+  sellFills  Fill[]      @relation("SellOrderFills")
 }
+
 model Fill{
+  id Int @id @default(autoincrement())
+  stockId Int
+  stock Stock @relation(fields: [stockId],references: [id])
+  price Float
+  qty Float
+  buyOrderId Int
+  buyOrder Order @relation("BuyOrderFills",fields: [buyOrderId],references: [id])
+  sellOrderId Int
+  sellOrder Order @relation("SellOrderFills",fields: [sellOrderId],references: [id])
 
 }
 model Stock{
-  
+  id Int @id @default(autoincrement())
+  title String
+  symbol String @unique
+  orders Order[]
+  fills Fill[]
 }
