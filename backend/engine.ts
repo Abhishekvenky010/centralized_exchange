@@ -1,6 +1,6 @@
 import { MarketOrderBook,UserBalance,OrderbookOrder } from "./types";
 import { validateAndLockBalances } from "./balances";
-
+import { matchOrder } from "./matchingEngine";
 
 export const ORDERBOOK : Record<string,MarketOrderBook> = {
     AXIS : {BIDS :{},ASKS:{}},
@@ -46,4 +46,11 @@ const newOrder : OrderbookOrder = {
 console.log(` Order #${newOrder.orderId} locked. Sending to matching engine...`);
 
 return { success: true, orderId: newOrder.orderId };
+const result = matchOrder(stockSymbol, side, price, newOrder);
+return { 
+  success: true, 
+  orderId: newOrder.orderId, 
+  filledFully: result.filledFully, 
+  remainingQty: result.remainingQty 
+};
 }
