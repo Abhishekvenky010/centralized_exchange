@@ -54,3 +54,23 @@ return {
   remainingQty: result.remainingQty 
 };
 }
+export function handleInMemorySettlement(
+    buyerId :number,
+    sellerId : number,
+    stockSymbol : string,
+    qty : number,
+    price : number
+){
+    const totalCost = qty * price;
+    if(BALANCES[buyerId]){
+        BALANCES[buyerId]["INR"] -= totalCost;
+        if(!BALANCES[buyerId][stockSymbol]){
+            BALANCES[buyerId][stockSymbol] = {total :0, locked :0};
+        }
+        BALANCES[buyerId][stockSymbol].total += qty;
+    }
+    if(BALANCES[sellerId]){
+        BALANCES[sellerId][stockSymbol] -= qty;
+        BALANCES[sellerId]["INR"]?.total += totalCost;
+    }
+}
